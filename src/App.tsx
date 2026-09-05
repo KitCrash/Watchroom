@@ -59,7 +59,7 @@ export const App: React.FC = () => {
 
   // Room & Connection state
   const [roomCode, setRoomCode] = useState<string | null>(() => getRoomIdFromUrl() || 'WR-7429');
-  const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
+  const [, setIsUserConnected] = useState<boolean>(false);
   const [userCount, setUserCount] = useState<number>(1);
   const [copied, setCopied] = useState<boolean>(false);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState<boolean>(false);
@@ -81,14 +81,7 @@ export const App: React.FC = () => {
   };
 
   // Chat messages
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      sender: 'system',
-      text: 'Watch Room ready. Share room link to watch YouTube Shorts together in real time!',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   // Set of all video IDs seen/loaded during the session to guarantee zero duplicate repeats
   const seenVideoIdsRef = useRef<Set<string>>(new Set());
@@ -156,12 +149,14 @@ export const App: React.FC = () => {
         }
         if (Array.isArray(data.room.messages)) {
           setMessages(
-            data.room.messages.map((m: any) => ({
-              id: m.id,
-              sender: m.sender === 'system' ? 'system' : (m.sender === 'you' || m.id?.startsWith('my-') ? 'you' : 'partner'),
-              text: m.text,
-              time: m.time,
-            }))
+            data.room.messages
+              .filter((m: any) => m.sender !== 'system' && !m.text?.includes('joined the room') && !m.text?.includes('left the room'))
+              .map((m: any) => ({
+                id: m.id,
+                sender: m.sender === 'you' || m.id?.startsWith('my-') ? 'you' : 'partner',
+                text: m.text,
+                time: m.time,
+              }))
           );
         }
       }
@@ -213,14 +208,9 @@ export const App: React.FC = () => {
 
     const handleNewMessage = (data: { message: any; senderId?: string }) => {
       const m = data.message;
-      if (!m) return;
+      if (!m || m.sender === 'system' || m.text?.includes('joined the room') || m.text?.includes('left the room')) return;
       const isMyMessage = data.senderId === s.id;
-      const formattedSender: 'you' | 'partner' | 'system' =
-        m.sender === 'system'
-          ? 'system'
-          : isMyMessage
-          ? 'you'
-          : 'partner';
+      const formattedSender: 'you' | 'partner' = isMyMessage ? 'you' : 'partner';
 
       setMessages((prev) => {
         if (prev.some((existing) => existing.id === m.id)) return prev;
@@ -539,9 +529,6 @@ export const App: React.FC = () => {
         roomCode={roomCode}
         onCopyLink={handleCopyLink}
         isCopied={copied}
-        isUserConnected={isUserConnected}
-        isPartnerConnected={isPartnerConnected}
-        userCount={userCount}
         onOpenRoomModal={() => setIsRoomModalOpen(true)}
         apiProvider={apiProvider}
       />

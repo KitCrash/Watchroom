@@ -58,16 +58,10 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
 
       {/* Messages Scroll Area */}
       <div className="chat-messages-container chat-messages-shorts">
-        {messages.map((msg) => {
-          if (msg.sender === 'system') {
-            return (
-              <div key={msg.id} className="chat-message msg-system">
-                <span className="system-bubble">{msg.text}</span>
-              </div>
-            );
-          }
-
-          const isYou = msg.sender === 'you';
+        {messages
+          .filter((msg) => msg.sender !== 'system' && !msg.text?.includes('joined the room') && !msg.text?.includes('left the room'))
+          .map((msg) => {
+            const isYou = msg.sender === 'you';
           return (
             <div
               key={msg.id}

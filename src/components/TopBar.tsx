@@ -5,9 +5,6 @@ interface TopBarProps {
   roomCode: string | null;
   onCopyLink: () => void;
   isCopied: boolean;
-  isUserConnected: boolean;
-  isPartnerConnected: boolean;
-  userCount?: number;
   onOpenRoomModal: () => void;
   apiProvider?: 'piped' | 'youtube';
 }
@@ -16,9 +13,6 @@ export const TopBar: React.FC<TopBarProps> = ({
   roomCode,
   onCopyLink,
   isCopied,
-  isUserConnected,
-  isPartnerConnected,
-  userCount = 1,
   onOpenRoomModal,
   apiProvider = 'youtube',
 }) => {
@@ -52,6 +46,18 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span className="no-room-badge">No Room</span>
           )}
 
+          {roomCode && (
+            <button
+              type="button"
+              className="share-link-pill-btn"
+              onClick={onCopyLink}
+              title="Copy shareable link to invite a friend"
+            >
+              {isCopied ? <Check size={11} className="check-success" /> : <Share2 size={11} />}
+              <span>{isCopied ? 'Link Copied!' : 'Share Link'}</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="api-header-pill"
@@ -81,41 +87,6 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span>Feed / Room</span>
           </button>
         </div>
-      </div>
-
-      {/* Bottom row: Real-time Connection Status & Share Link button */}
-      <div className="header-status-row">
-        <div className="status-indicator-group">
-          <div className="status-chip">
-            <span className={`status-dot ${isUserConnected ? 'dot-active' : 'dot-inactive'}`} />
-            <span className="status-label-text">
-              {isUserConnected ? 'You connected' : 'Connecting...'}
-            </span>
-          </div>
-
-          <span className="status-pipe">|</span>
-
-          <div className="status-chip">
-            <span className={`status-dot ${isPartnerConnected ? 'dot-partner' : 'dot-waiting'}`} />
-            <span className="status-label-text">
-              {isPartnerConnected
-                ? `Partner connected (${userCount})`
-                : 'Waiting for partner'}
-            </span>
-          </div>
-        </div>
-
-        {roomCode && (
-          <button
-            type="button"
-            className="share-link-pill-btn"
-            onClick={onCopyLink}
-            title="Copy shareable link to invite a friend"
-          >
-            {isCopied ? <Check size={11} className="check-success" /> : <Share2 size={11} />}
-            <span>{isCopied ? 'Link Copied!' : 'Share Link'}</span>
-          </button>
-        )}
       </div>
     </header>
   );

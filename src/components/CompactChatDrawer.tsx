@@ -103,31 +103,25 @@ export const CompactChatDrawer: React.FC<CompactChatDrawerProps> = ({
 
             {/* Scrollable messages inside bubble */}
             <div className="bubble-messages-body">
-              {messages.map((msg) => {
-                if (msg.sender === 'system') {
+              {messages
+                .filter((msg) => msg.sender !== 'system' && !msg.text?.includes('joined the room') && !msg.text?.includes('left the room'))
+                .map((msg) => {
+                  const isYou = msg.sender === 'you';
                   return (
-                    <div key={msg.id} className="bubble-msg msg-system">
-                      <span className="bubble-system-pill">{msg.text}</span>
+                    <div
+                      key={msg.id}
+                      className={`bubble-msg ${isYou ? 'msg-you' : 'msg-partner'}`}
+                    >
+                      <div className="bubble-msg-meta">
+                        <span className="bubble-author">{isYou ? 'You' : partnerName}</span>
+                        <span className="bubble-time">{msg.time}</span>
+                      </div>
+                      <div className="bubble-text-box">
+                        <p className="bubble-text">{msg.text}</p>
+                      </div>
                     </div>
                   );
-                }
-
-                const isYou = msg.sender === 'you';
-                return (
-                  <div
-                    key={msg.id}
-                    className={`bubble-msg ${isYou ? 'msg-you' : 'msg-partner'}`}
-                  >
-                    <div className="bubble-msg-meta">
-                      <span className="bubble-author">{isYou ? 'You' : partnerName}</span>
-                      <span className="bubble-time">{msg.time}</span>
-                    </div>
-                    <div className="bubble-text-box">
-                      <p className="bubble-text">{msg.text}</p>
-                    </div>
-                  </div>
-                );
-              })}
+                })}
               <div ref={messagesEndRef} />
             </div>
 

@@ -196,58 +196,6 @@ html, body {
   border-color: var(--border-dark);
 }
 
-/* Header Status Row: "You connected" and "Partner connected" */
-.header-status-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 12px 6px;
-  background-color: var(--bg-subtle);
-  border-top: 1px solid #f3f4f6;
-  font-size: 11px;
-}
-
-.status-indicator-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.status-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.dot-active, .dot-partner {
-  background-color: var(--status-connected);
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
-}
-
-.dot-inactive {
-  background-color: var(--border-dark);
-}
-
-.dot-waiting {
-  background-color: var(--status-waiting);
-}
-
-.status-label-text {
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.status-pipe {
-  color: var(--border-default);
-}
 
 .share-link-pill-btn {
   background-color: #ffffff;
