@@ -140,11 +140,6 @@ export const ShortsFeed: React.FC<ShortsFeedProps> = ({
                 </div>
               )}
 
-              {/* Bottom info text */}
-              <div className="short-bottom-info">
-                <p className="short-channel-name">{item.channel}</p>
-                <p className="short-item-title">{item.title}</p>
-              </div>
             </div>
 
             {/* Simple video controls on each item: Play, Pause, Sync, Next */}

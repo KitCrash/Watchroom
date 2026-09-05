@@ -395,34 +395,6 @@ html, body {
   border-radius: var(--radius-sm);
 }
 
-/* Bottom info text on video */
-.short-bottom-info {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  right: 8px;
-  z-index: 10;
-  background-color: rgba(0, 0, 0, 0.65);
-  padding: 5px 9px;
-  border-radius: var(--radius-sm);
-  backdrop-filter: blur(4px);
-  pointer-events: none;
-}
-
-.short-channel-name {
-  font-size: 10px;
-  font-weight: 700;
-  color: #f4f4f5;
-  margin-bottom: 1px;
-}
-
-.short-item-title {
-  font-size: 11px;
-  color: #e4e4e7;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 /* ITEM CONTROLS BAR (Play, Pause, Sync, Next) */
 .item-controls-bar {
