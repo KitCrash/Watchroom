@@ -63,7 +63,8 @@ export const App: React.FC = () => {
   const [userCount, setUserCount] = useState<number>(1);
   const [copied, setCopied] = useState<boolean>(false);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(true);
+  const [roomModalTab, setRoomModalTab] = useState<'room' | 'feed' | 'settings'>('room');
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(() => (typeof window !== 'undefined' ? window.innerWidth > 768 : false));
 
   // Guard flag to prevent remote socket updates from echoing back to partner
   const isRemoteSync = useRef<boolean>(false);
@@ -481,6 +482,39 @@ export const App: React.FC = () => {
     setTimeout(() => setCopied(false), 2200);
   };
 
+  const handleShareLink = async () => {
+    if (!roomCode) return;
+    const fullUrl = `${window.location.origin}${getRoomPath(roomCode)}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Watch YouTube Shorts together on Watch Room!',
+          text: `Join my watch room: ${roomCode}`,
+          url: fullUrl,
+        });
+        showToast('Shared successfully! 🚀');
+        return;
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setCopied(true);
+      showToast('Share link copied! Send to partner 📋');
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      showToast(`Room Link: ${fullUrl}`);
+    }
+  };
+
+  const handleOpenRoomModal = (tab: 'room' | 'feed' | 'settings' = 'room') => {
+    setRoomModalTab(tab);
+    setIsRoomModalOpen(true);
+  };
+
   // Adding custom Shorts URL to feed
   const handleAddShortUrl = (url: string) => {
     const parsed = extractYouTubeId(url);
@@ -528,8 +562,9 @@ export const App: React.FC = () => {
       <TopBar
         roomCode={roomCode}
         onCopyLink={handleCopyLink}
+        onShareLink={handleShareLink}
         isCopied={copied}
-        onOpenRoomModal={() => setIsRoomModalOpen(true)}
+        onOpenRoomModal={handleOpenRoomModal}
         apiProvider={apiProvider}
       />
 
@@ -562,6 +597,7 @@ export const App: React.FC = () => {
         isOpen={isRoomModalOpen}
         onClose={() => setIsRoomModalOpen(false)}
         currentRoom={roomCode}
+        initialTab={roomModalTab}
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
         onLeaveRoom={handleLeaveRoom}
@@ -573,6 +609,7 @@ export const App: React.FC = () => {
         customPipedUrl={customPipedUrl}
         onChangeCustomPipedUrl={handleChangeCustomPipedUrl}
         onCopyLink={handleCopyLink}
+        onShareLink={handleShareLink}
         isCopied={copied}
       />
 

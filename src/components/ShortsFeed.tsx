@@ -45,7 +45,10 @@ export const ShortsFeed: React.FC<ShortsFeedProps> = ({
     const targetElement = containerRef.current.children[activeIndex] as HTMLElement;
     if (targetElement) {
       isScrollingProgrammatically.current = true;
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      containerRef.current.scrollTo({
+        top: targetElement.offsetTop,
+        behavior: 'smooth',
+      });
       const timer = setTimeout(() => {
         isScrollingProgrammatically.current = false;
       }, 500);
