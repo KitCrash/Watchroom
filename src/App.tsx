@@ -16,9 +16,25 @@ import type { ChatMessage } from './types';
 
 function getRoomIdFromUrl(): string | null {
   const path = window.location.pathname;
-  const match = path.match(/^\/room\/([a-zA-Z0-9_-]+)/i);
+  const match = path.match(/\/room\/([a-zA-Z0-9_-]+)/i);
   if (match) return match[1].toUpperCase();
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const roomParam = params.get('room');
+    if (roomParam) return roomParam.toUpperCase();
+  } catch {}
+
+  const hashMatch = window.location.hash.match(/room\/([a-zA-Z0-9_-]+)/i);
+  if (hashMatch) return hashMatch[1].toUpperCase();
+
   return null;
+}
+
+function getRoomPath(code: string | null): string {
+  const base = import.meta.env.BASE_URL || '/';
+  const prefix = base.endsWith('/') ? base : `${base}/`;
+  return code ? `${prefix}room/${code}` : prefix;
 }
 
 export const App: React.FC = () => {
@@ -75,11 +91,7 @@ export const App: React.FC = () => {
 
   // URL routing helper
   const navigateToRoom = (code: string | null) => {
-    if (code) {
-      window.history.pushState({}, '', `/room/${code}`);
-    } else {
-      window.history.pushState({}, '', '/');
-    }
+    window.history.pushState({}, '', getRoomPath(code));
     setRoomCode(code);
   };
 
@@ -99,7 +111,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const fromUrl = getRoomIdFromUrl();
     if (!fromUrl && roomCode) {
-      window.history.replaceState({}, '', `/room/${roomCode}`);
+      window.history.replaceState({}, '', getRoomPath(roomCode));
     }
   }, []);
 
@@ -468,7 +480,7 @@ export const App: React.FC = () => {
 
   const handleCopyLink = () => {
     if (!roomCode) return;
-    const fullUrl = `${window.location.origin}/room/${roomCode}`;
+    const fullUrl = `${window.location.origin}${getRoomPath(roomCode)}`;
     navigator.clipboard?.writeText(fullUrl);
     setCopied(true);
     showToast(`Share link copied! Send to partner 📋`);

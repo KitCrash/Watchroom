@@ -249,7 +249,7 @@ export const RoomModal: React.FC<RoomModalProps> = ({
                       type="text"
                       readOnly
                       className="modal-text-input text-xs"
-                      value={`${window.location.origin}/room/${currentRoom}`}
+                      value={`${window.location.origin}${import.meta.env.BASE_URL || '/'}room/${currentRoom}`.replace(/([^:]\/)\/+/g, '$1')}
                     />
                     <button
                       type="button"

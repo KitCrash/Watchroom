@@ -5,8 +5,9 @@ let socket: Socket | null = null;
 
 export function getSocket(): Socket {
   if (!socket) {
-    // Connect to current origin, proxying /socket.io to the backend
-    socket = io({
+    const customUrl = typeof window !== 'undefined' ? localStorage.getItem('watchroom_server_url') : null;
+    const backendUrl = customUrl || (import.meta.env.VITE_BACKEND_URL as string) || undefined;
+    socket = io(backendUrl || undefined, {
       transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnectionAttempts: 10,
