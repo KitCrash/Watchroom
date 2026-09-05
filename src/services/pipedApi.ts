@@ -1,11 +1,10 @@
 import type { ShortItem } from '../utils/youtube';
 
 export const DEFAULT_PIPED_INSTANCES: string[] = [
+  'https://api.piped.privacydev.net',
   'https://pipedapi.kavin.rocks',
   'https://pipedapi.leptons.xyz',
   'https://piped-api.lunar.icu',
-  'https://api.piped.privacydev.net',
-  'https://pipedapi.ducks.party',
 ];
 
 export interface PipedApiResponse {
@@ -35,7 +34,7 @@ async function fetchFromInstance(
   instanceUrl: string,
   query: string,
   nextPageToken?: string | null,
-  timeoutMs: number = 3500
+  timeoutMs: number = 2500
 ): Promise<PipedApiResponse> {
   const cleanBase = instanceUrl.replace(/\/+$/, '');
   const url = nextPageToken
@@ -80,6 +79,10 @@ async function fetchFromInstance(
       })
       .filter((item: ShortItem) => item.videoId.length === 11);
 
+    if (items.length === 0) {
+      throw new Error(`No items found on ${cleanBase}`);
+    }
+
     return {
       items,
       nextPageToken: data.nextpage || null,
@@ -92,33 +95,25 @@ async function fetchFromInstance(
 
 /**
  * Fetch shorts via Piped API.
- * First tries custom instance if provided, then walks through public instances pool.
+ * Uses custom instance if specified, otherwise races public candidates concurrently.
  */
 export async function fetchPipedShorts(
   nextPageToken: string | null = null,
   query: string = '#shorts trending viral',
   customInstance?: string
 ): Promise<PipedApiResponse> {
-  const candidateInstances: string[] = [];
-
   if (customInstance && customInstance.trim()) {
-    candidateInstances.push(customInstance.trim());
+    return await fetchFromInstance(customInstance.trim(), query, nextPageToken, 3500);
   }
 
-  candidateInstances.push(...DEFAULT_PIPED_INSTANCES);
+  // Race public instances in parallel so we don't stall for seconds
+  const attempts = DEFAULT_PIPED_INSTANCES.map((inst) =>
+    fetchFromInstance(inst, query, nextPageToken, 2500)
+  );
 
-  const errors: string[] = [];
-
-  for (const instance of candidateInstances) {
-    try {
-      const result = await fetchFromInstance(instance, query, nextPageToken, 3000);
-      if (result.items.length > 0) {
-        return result;
-      }
-    } catch (err: any) {
-      errors.push(`${instance}: ${err.message || err}`);
-    }
+  try {
+    return await Promise.any(attempts);
+  } catch {
+    throw new Error('Public Piped API instances unavailable or blocked by CORS');
   }
-
-  throw new Error(`All Piped instances failed: ${errors.slice(0, 3).join('; ')}`);
 }

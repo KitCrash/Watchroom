@@ -45,9 +45,13 @@ export const App: React.FC = () => {
   const [activeTopicQuery, setActiveTopicQuery] = useState<string>('#shorts trending viral');
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
-  // API Provider state (Piped vs YouTube Data API)
+  // API Provider state (Default to official YouTube Data API with provided API key)
   const [apiProvider, setApiProvider] = useState<ApiProvider>(() => {
-    return (localStorage.getItem('preferred_shorts_provider') as ApiProvider) || 'piped';
+    const saved = localStorage.getItem('preferred_shorts_provider') as ApiProvider;
+    if (saved === 'piped' && localStorage.getItem('custom_piped_url')) {
+      return 'piped';
+    }
+    return 'youtube';
   });
   const [customPipedUrl, setCustomPipedUrl] = useState<string>(() => {
     return localStorage.getItem('custom_piped_url') || '';

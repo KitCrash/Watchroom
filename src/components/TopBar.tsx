@@ -20,7 +20,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   isPartnerConnected,
   userCount = 1,
   onOpenRoomModal,
-  apiProvider = 'piped',
+  apiProvider = 'youtube',
 }) => {
   return (
     <header className="sticky-feed-header">

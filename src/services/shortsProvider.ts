@@ -38,15 +38,14 @@ export async function fetchShortsFeed(params: FetchShortsParams): Promise<FetchS
           notice: null,
         };
       }
-    } catch (err: any) {
-      console.warn('Piped API unavailable, falling back to YouTube API:', err.message);
+    } catch {
       // Seamless auto-fallback to YouTube Data API
       const ytResult = await fetchLiveShorts(pageToken, query);
       return {
         items: ytResult.items,
         nextPageToken: ytResult.nextPageToken,
         providerUsed: 'youtube',
-        notice: 'Public Piped instances unreachable. Seamlessly fell back to YouTube API.',
+        notice: 'Piped instances unavailable. Seamlessly using YouTube API.',
       };
     }
   }
