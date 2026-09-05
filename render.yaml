@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: watchroom
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node server/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_YOUTUBE_API_KEY
+        value: AIzaSyC5lzUaxMzLu59I_NZzBNUMeEdPNnRYeNQ
